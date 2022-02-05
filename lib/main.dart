@@ -28,7 +28,7 @@ class MyHomePage extends StatelessWidget {
   Future<List> _getVieos() async {
     final ura = "www.youtube.com";
     final api = "/feeds/videos.xml";
-    final _params = {"playlist_id": "PLH-8iHMW2k5W6wH9RszrAn-Cbg4S_yEij"};
+    final _params = {"playlist_id": "PLtbVrXrXvlbyAWzjJW00F92lg1aEJfH_V"};
     final url = Uri.https(ura, api, _params);
     print(url);
     http.Response response = await http.get(url);
@@ -47,9 +47,25 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: unnecessary_new
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(""),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Show Snackbar',
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => MyHomePage()),
+                (Route<dynamic> route) => false,
+              );
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(const SnackBar(content: Text('Yenilendi')));
+            },
+          ),
+        ],
       ),
       body: Container(
         color: Colors.white,
