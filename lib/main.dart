@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: true,
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
@@ -56,51 +56,55 @@ class MyHomePage extends StatelessWidget {
         child: FutureBuilder(
           future: _getVieos(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
-            //print(snapshot.data[1]['yt:videoId']);
-            if (snapshot.hasError) {
-              return Container(child: Center(child: Text("HATA")));
-            } else if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: snapshot.data.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Column(
-                    children: [
-                      Divider(),
-                      ListTile(
-                        leading: Container(
-                          height: 150,
-                          width: 150,
-                          child: Image.network(
-                            'https://i4.ytimg.com/vi/' +
-                                snapshot.data[index]['yt:videoId'] +
-                                '/hqdefault.jpg',
-                            fit: BoxFit.cover,
-                            height: double.infinity,
-                            width: double.infinity,
-                            alignment: Alignment.center,
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+                return Text("None");
+              case ConnectionState.waiting:
+                return SpinKitRotatingCircle(color: Colors.black);
+              case ConnectionState.done:
+                return ListView.builder(
+                  itemCount: snapshot.data.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Column(
+                      children: [
+                        Divider(),
+                        ListTile(
+                          leading: Container(
+                            height: 150,
+                            width: 150,
+                            child: Image.network(
+                              'https://i4.ytimg.com/vi/' +
+                                  snapshot.data[index]['yt:videoId'] +
+                                  '/hqdefault.jpg',
+                              fit: BoxFit.cover,
+                              height: double.infinity,
+                              width: double.infinity,
+                              alignment: Alignment.center,
+                            ),
                           ),
+                          hoverColor: Colors.red,
+                          selectedColor: Colors.red,
+                          title: Text(snapshot.data[index]['title']),
+                          subtitle: Text(
+                              snapshot.data[index]['published'].toString()),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Showcon(
+                                        item: snapshot.data[index],
+                                      )),
+                            );
+                          },
                         ),
-                        hoverColor: Colors.red,
-                        selectedColor: Colors.red,
-                        title: Text(snapshot.data[index]['title']),
-                        subtitle:
-                            Text(snapshot.data[index]['published'].toString()),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Showcon(
-                                      item: snapshot.data[index],
-                                    )),
-                          );
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            } else {
-              return SpinKitRotatingCircle(color: Colors.black);
+                      ],
+                    );
+                  },
+                );
+              case ConnectionState.active:
+                return Container(
+                    child: Center(
+                        child: Text(snapshot.hasData.hashCode.toString())));
             }
           },
         ),
